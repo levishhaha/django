@@ -1,0 +1,187 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>博客首页</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'css/index.css' %}" />
+</head>
+
+<body>
+    <div class="container">
+        <header
+            class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+            <div class="col-md-3 mb-2 mb-md-0">
+                <!-- <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none"> -->
+                <img class="logo" src="{% static 'image/Blog_logo.png' %}" alt="" />
+                <!-- </a> -->
+            </div>
+            <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+                <li>
+                    <a href="{% url 'home:index' %}" class="nav-link px-2">首页</a>
+                </li>
+                <li>
+                    <a href="{% url 'home:blog_pub' %}" class="nav-link px-2">发布博客</a>
+                </li>
+            </ul>
+            <div class="col-md-3 text-end">
+                {% if user.is_authenticated %}
+                <a href="#" class="text-decoration-none text-dark">
+                    <img class="rounded-circle" width="32" height="32" src="{{ user.userinfo.avatar.url }}" onerror="this.src='/media/avatars/default.png'">
+                    <span>{{ username }}</span>
+                </a>
+                {% else %}
+                <a href="{% url 'Buser:login' %}" type="button" class="btn btn-outline-primary me-2">登录</a>
+                <a href="{% url 'Buser:register' %}" type="button" class="btn btn-primary">注册</a>
+                {% endif %}
+            </div>
+        </header>
+    </div>
+    <div class="container mt-3 p-3 rounded-2">
+        <h1 class="text-center">用户信息</h1>
+        <!-- 信息部分 -->
+        <div class="w-50 mx-auto p-3 rounded-2">
+            <div class="container mt-3 p-3 rounded-2 bg-light">
+                <span>用户名</span>
+                <span class="cursor-pointer float-end" data-bs-toggle="modal" data-bs-target="#editNameModal">
+                    {{ username }}
+                </span>
+            </div>
+            <div class="container mt-3 p-3 rounded-2 bg-light" style="height: 86px;">
+                <span>头像</span>
+                <div class="float-end">
+                    <img class="rounded-circle" style="height: 50px;width: 50px;cursor: pointer;" src="{{ user.userinfo.avatar.url }}" 
+                        onerror="this.src='/media/avatars/default.png'" data-bs-target="#editImageModal" data-bs-toggle="modal">
+                </div>
+            </div>
+            <div class="container mt-3 p-3 rounded-2 bg-light">
+                <span>邮箱</span><span class="float-end">{{ email }}</span>
+            </div>
+            <div class="container mt-3 p-3 rounded-2 bg-white">
+                <a href="{% url 'Buser:Blog_logout' %}" type="button" class="btn btn-primary">退出登录</a>
+            </div>
+        </div>
+
+
+        <!-- 修改昵称弹窗 -->
+        <div class="modal fade" id="editNameModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">修改昵称</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <input type="text" name="username" class="form-control" placeholder="请输入新昵称" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">确认修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- 修改头像弹窗 -->
+        <div class="modal fade" id="editImageModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">修改头像</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <input type="file" name="user_image" class="form-control" accept="image/*" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-primary">确认修改</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- 用户管理博客部分 -->
+    <div class="container mt-3 p-3 rounded-2">
+        <div>
+            <h2 class="text-center">发布过的博客</h2>
+        </div>
+        <div class="row row-cols-2 row-gap-4">
+            {% for item in blog %}
+            <div class="col">
+                <div class="card text-left">
+                    <div class="card-header"><a href="{% url 'Buser:blog_detail_user' item.id %}"
+                            class="text-dark text-decoration-none">{{ item.title|safe }}</a></div>
+                    <div class="card-body text-truncate">
+                        <div class="card-text text-truncate">{{ item.content|safe }}</div>
+                    </div>
+                    <div class="card-footer text-body-secondary d-flex justify-content-between">
+                        <div>
+                            
+                            <img width="30px" height="30px" src="{{ item.author.userinfo.avatar.url }}" class="rounded-circle"
+                                alt="" />
+                            {{ item.author }}
+                        </div>
+                        <div>{{ item.pub_time|date:'Y年m月d日' }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="d-flex justify-content-center w-100">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                        {% if blog.number == 1 %}
+                        <li class="page-item"><a class="page-link" href="#">第一页啦!</a></li>
+                        {% else %}
+                        <li class="page-item"><a class="page-link" href="?page=1">第一页</a></li>
+                        <li class="page-item"><a class="page-link" href="?page={{ blog.number|add:-1 }}">上一页</a></li>
+                        {% endif %}
+
+                        {% for page in paginator.page_range %}
+                            {% if page >= blog.number|add:-3 and page <= blog.number|add:3 %}
+                                {% if page == blog.number %}
+                                    <li class="page-item active"><a class="page-link" href="#">{{ page }}</a></li>
+                                {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if blog.number == paginator.page_range|last %}
+                            <li class="page-item"><a class="page-link" href="#">最后一页啦!</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ blog.number|add:1 }}">下一页</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ paginator.page_range|last }}">最后一页</a></li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"
+    integrity="sha384-zYPOMqeu1DAVkHiLqWBUTcbYfZ8osu1Nd6Z89ify25QV9guujx43ITvfi12/QExE"
+    crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.min.js"
+    integrity="sha384-heAjqF+bCxXpCWLa6Zhcp4fu20XoNIA98ecBC1YkdXhszjoejr5y9Q77hIrv8R9i"
+    crossorigin="anonymous"></script>
+
+
+</script>
+
+</html>

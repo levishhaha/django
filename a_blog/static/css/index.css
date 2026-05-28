@@ -1,0 +1,12 @@
+.logo{
+    height: 50px;
+    width: 50px;
+}
+body{background-color: rgba(0, 0, 0, 0.1);}
+.container{
+    background-color: white;
+}
+/* 固定卡片内容高度 */
+.card-body{
+    height: 100px;
+}

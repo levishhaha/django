@@ -150,7 +150,7 @@ EMAIL_HOST='smtp.qq.com'
 EMAIL_PORT=587
 # 填个人相关信息
 EMAIL_HOST_USER='2209326772@qq.com'
-EMAIL_HOST_PASSWORD='ommjoxvnnkrheacc' # 填授权码
+EMAIL_HOST_PASSWORD='' # 填授权码
 DEFAULT_FROM_EMAIL='2209326772@qq.com'
 
 
